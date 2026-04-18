@@ -15,13 +15,13 @@ export default function App() {
 
       <Suspense fallback={<h1>ЗАГРУЖАЄМО...</h1>}>
         <Routes>
-          <Route index element={<HomeView />} />
+          <Route path="/" element={<HomeView />} />
           
           <Route path="books" element={<BooksView />} />
           <Route path="books/:slug" element={<BookDetailsView />} />
           
-          <Route path="/" element={<HomeView />} />
-          
+          <Route path="hw-36-selectors" element={<Navigate to="/" replace />} />
+
           <Route path="*" element={<NotFoundView />} />
         </Routes>
       </Suspense>
