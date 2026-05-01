@@ -1,7 +1,8 @@
 import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
 import { fetchBooks } from './booksOperations';
 
-const booksAdapter = createEntityAdapter();
+const booksAdapter = createEntityAdapter({
+});
 
 const booksSlice = createSlice({
   name: 'books',
@@ -17,6 +18,7 @@ const booksSlice = createSlice({
       })
       .addCase(fetchBooks.fulfilled, (state, action) => {
         state.isLoading = false;
+
         booksAdapter.setAll(state, action.payload);
       })
       .addCase(fetchBooks.rejected, (state, action) => {

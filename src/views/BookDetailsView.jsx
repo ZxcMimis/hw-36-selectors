@@ -1,45 +1,55 @@
 import { useSelector } from 'react-redux';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, Link, useNavigate } from 'react-router-dom';
 import { booksSelectors } from '../redux/books';
 import PageHeading from '../components/PageHeading/PageHeading';
-import styles from './BookDetailsView.module.scss'; 
+import styles from './BookDetailsView.module.scss';
 
 export default function BookDetailsView() {
-  const location = useLocation();
   const { slug } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const bookId = slug.match(/[a-z0-9]+$/)[0];
+  const bookId = slug.match(/[a-z0-9]+$/)?.[0];
 
-  const entities = useSelector(booksSelectors.getBookEntities);
-  const book = entities[bookId];
+  const book = useSelector(state => booksSelectors.getBookById(state, bookId));
 
-  const backLinkHref = location.state?.from ?? '/books';
+  const goBackPath = location.state?.from ?? '/books';
+
+  if (!book && bookId) {
+    return <h2 className={styles.error}>Книга не найдена в базе данных</h2>;
+  }
 
   return (
-    <div className={styles.container}>
-      <PageHeading text="Деталі книги" />
+    <main className={styles.detailsContainer}>
+      <button 
+        onClick={() => navigate(goBackPath)} 
+        className={styles.backBtn}
+      >
+        ← Вернуться назад
+      </button>
 
-      {book ? (
-        <>
-          <Link to={backLinkHref} className={styles.backBtn}>
-            {location.state?.label ?? '← Назад'}
-          </Link>
+      {book && (
+        <section className={styles.layout}>
+          <div className={styles.poster}>
+            <img src={book.imgUrl} alt={book.title} />
+          </div>
 
-          <div className={styles.card}>
-            <div className={styles.imageWrapper}>
-              <img src={book.imgUrl} alt={book.title} />
+          <div className={styles.content}>
+            <PageHeading text={book.title} />
+            <div className={styles.infoGroup}>
+              <p><strong>Автор:</strong> {book.author?.name || 'Неизвестен'}</p>
+              <p><strong>Жанр:</strong> {book.genre}</p>
             </div>
             
-            <div className={styles.info}>
-              <h2 className={styles.title}>{book.title}</h2>
-              <p className={styles.author}>Автор: {book.author?.name || 'Невідомий'}</p>
-              <p className={styles.description}>{book.descr}</p>
-            </div>
+            <article className={styles.description}>
+              <h4>Описание</h4>
+              <p>{book.descr}</p>
+            </article>
+
+            <button className={styles.buyBtn}>Читать онлайн</button>
           </div>
-        </>
-      ) : (
-        <h2>Книгу не знайдено або завантаження...</h2>
+        </section>
       )}
-    </div>
+    </main>
   );
 }

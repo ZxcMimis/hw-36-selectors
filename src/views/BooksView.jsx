@@ -4,7 +4,7 @@ import slugify from 'slugify';
 import { useSelector, useDispatch } from 'react-redux';
 import { booksOperations, booksSelectors } from '../redux/books';
 import PageHeading from '../components/PageHeading/PageHeading';
-import styles from './BooksView.module.scss'; 
+import styles from './BooksView.module.scss';
 
 const makeSlug = string => slugify(string, { lower: true });
 
@@ -32,48 +32,46 @@ export default function BooksView() {
   );
 
   return (
-    <>
-      <PageHeading text="Книги" />
+    <div className={styles.wrapper}>
+      <PageHeading text="Библиотека" />
 
-      <div className={styles.searchContainer}>
+      <div className={styles.searchBar}>
         <input
           type="text"
           value={bookQuery}
           onChange={handleSearchChange}
-          className={styles.searchInput}
-          placeholder="Знайти книгу за назвою..."
+          placeholder="Поиск по названию..."
+          className={styles.input}
         />
       </div>
 
-      {isLoading && <h2>Завантаження...</h2>}
+      {isLoading && <h2 className={styles.loader}>Загрузка...</h2>}
 
-      {!isLoading && visibleBooks.length > 0 ? (
-        <ul className={styles.bookList}>
-          {visibleBooks.map(book => (
-            <li key={book.id} className={styles.bookCard}>
+      {!isLoading && (
+        <ul className={styles.grid}>
+          {visibleBooks.map(({ id, title, imgUrl, genre }) => (
+            <li key={id} className={styles.card}>
               <Link
-                to={`/books/${makeSlug(`${book.title} ${book.id}`)}`}
-                state={{ from: location, label: 'Назад до списку' }}
-                className={styles.bookLink}
+                to={`/books/${makeSlug(`${title} ${id}`)}`}
+                state={{ from: location }} // Сохраняем место, откуда пришли
+                className={styles.link}
               >
-                <div className={styles.thumb}>
-                  <img src={book.imgUrl} alt={book.title} />
+                <div className={styles.imageContainer}>
+                  <img src={imgUrl} alt={title} />
                 </div>
-                <div className={styles.content}>
-                  <h3 className={styles.title}>{book.title}</h3>
-                  <p className={styles.genre}>{book.genre}</p>
+                <div className={styles.meta}>
+                  <h3 className={styles.bookTitle}>{title}</h3>
+                  <span className={styles.tag}>{genre}</span>
                 </div>
               </Link>
             </li>
           ))}
         </ul>
-      ) : (
-        !isLoading && (
-          <p className={styles.noResults}>
-            На жаль, за запитом <b>«{bookQuery}»</b> нічого не знайдено 😢
-          </p>
-        )
       )}
-    </>
+
+      {!isLoading && visibleBooks.length === 0 && (
+        <p className={styles.empty}>Ничего не найдено по запросу "{bookQuery}"</p>
+      )}
+    </div>
   );
 }

@@ -1,0 +1,1 @@
+import{h as e}from"./index-CeiVVwxr.js";const r=t=>t.books,a=e([r],t=>t.entities||{}),n=e([a],t=>Object.values(t));e([n,t=>t.books.filter],(t,o)=>{if(!o)return t;const s=o.toLowerCase();return t.filter(i=>i.title.toLowerCase().includes(s))});const l=t=>t.books.isLoading;export{l as a,a as b,n as g};
