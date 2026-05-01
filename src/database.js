@@ -104,5 +104,4 @@ export const db = {
     { id: 4, name: "В'ячеслав Шалигін" }
   ],
 
-  users: []
 };
