@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useParams, useLocation, Link } from 'react-router-dom';
+import { booksSelectors } from '../redux/books';
 import PageHeading from '../components/PageHeading/PageHeading';
-import * as bookShelfAPI from '../services/bookshelf-api';
-// Импортируем наши новые стили
 import styles from './BookDetailsView.module.scss'; 
 
 export default function BookDetailsView() {
   const location = useLocation();
   const { slug } = useParams();
-  const bookId = slug.match(/[a-z0-9]+$/)[0];
-  const [book, setBook] = useState(null);
 
-  useEffect(() => {
-    bookShelfAPI.fetchBookById(bookId).then(setBook);
-  }, [bookId]);
+  const bookId = slug.match(/[a-z0-9]+$/)[0];
+
+  const entities = useSelector(booksSelectors.getBookEntities);
+  const book = entities[bookId];
 
   const backLinkHref = location.state?.from ?? '/books';
 
@@ -21,7 +19,7 @@ export default function BookDetailsView() {
     <div className={styles.container}>
       <PageHeading text="Деталі книги" />
 
-      {book && (
+      {book ? (
         <>
           <Link to={backLinkHref} className={styles.backBtn}>
             {location.state?.label ?? '← Назад'}
@@ -34,11 +32,13 @@ export default function BookDetailsView() {
             
             <div className={styles.info}>
               <h2 className={styles.title}>{book.title}</h2>
-              <p className={styles.author}>Автор: {book.author.name}</p>
+              <p className={styles.author}>Автор: {book.author?.name || 'Невідомий'}</p>
               <p className={styles.description}>{book.descr}</p>
             </div>
           </div>
         </>
+      ) : (
+        <h2>Книгу не знайдено або завантаження...</h2>
       )}
     </div>
   );

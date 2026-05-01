@@ -11,7 +11,10 @@ const makeSlug = string => slugify(string, { lower: true });
 export default function BooksView() {
   const location = useLocation();
   const dispatch = useDispatch();
-  const books = useSelector(booksSelectors.getBooks);
+  
+  const books = useSelector(booksSelectors.getAllBooks);
+  const isLoading = useSelector(booksSelectors.getIsLoading);
+
   const [searchParams, setSearchParams] = useSearchParams();
   const bookQuery = searchParams.get('query') ?? '';
 
@@ -42,16 +45,15 @@ export default function BooksView() {
         />
       </div>
 
-      {visibleBooks.length > 0 ? (
+      {isLoading && <h2>Завантаження...</h2>}
+
+      {!isLoading && visibleBooks.length > 0 ? (
         <ul className={styles.bookList}>
           {visibleBooks.map(book => (
             <li key={book.id} className={styles.bookCard}>
               <Link
-                to={`${makeSlug(`${book.title} ${book.id}`)}`}
-                state={{
-                  from: location,
-                  label: 'Назад до пошуку',
-                }}
+                to={`/books/${makeSlug(`${book.title} ${book.id}`)}`}
+                state={{ from: location, label: 'Назад до списку' }}
                 className={styles.bookLink}
               >
                 <div className={styles.thumb}>
@@ -66,9 +68,11 @@ export default function BooksView() {
           ))}
         </ul>
       ) : (
-        <p className={styles.noResults}>
-          На жаль, за запитом <b>«{bookQuery}»</b> нічого не знайдено 😢
-        </p>
+        !isLoading && (
+          <p className={styles.noResults}>
+            На жаль, за запитом <b>«{bookQuery}»</b> нічого не знайдено 😢
+          </p>
+        )
       )}
     </>
   );
